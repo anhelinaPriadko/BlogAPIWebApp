@@ -1,0 +1,84 @@
+﻿<!-- Posts.html -->
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Posts Management</title>
+    <!-- Підключіть Bootstrap CSS тут -->
+</head>
+<body>
+    <div class="container my-4">
+        <h1 class="mb-4">Пости</h1>
+
+        <h3>Додати пост</h3>
+        <form id="add-post-form" onsubmit="event.preventDefault(); addPost();" class="mb-5">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="add-author">Автор</label>
+                    <select id="add-author" class="form-control" required></select>
+                </div>
+                <div class="form-group col-md-8">
+                    <label for="add-text">Текст поста</label>
+                    <textarea id="add-text" class="form-control" rows="2" placeholder="Post text" required></textarea>
+                </div>
+            </div>
+            <div class="form-row mt-3">
+                <div class="form-group col-md-4">
+                    <label for="add-datetime">Дата та час</label>
+                    <input type="datetime-local" id="add-datetime" class="form-control" required>
+                </div>
+                <div class="form-group col-md-8">
+                    <label for="add-tags">Теги</label>
+                    <select id="add-tags" class="form-control" multiple>
+                        <!-- JS заповнить опціями -->
+                    </select>
+                    <small class="form-text text-muted">Утримуйте Ctrl (Cmd на Mac), щоб вибрати декілька тегів</small>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Post</button>
+        </form>
+
+        <!-- Edit form -->
+        <div id="editForm" class="card mb-5" style="display:none;">
+            <div class="card-body">
+                <h3 class="card-title">Редагувати пост</h3>
+                <form onsubmit="event.preventDefault(); updatePost();">
+                    <input type="hidden" id="edit-id">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="edit-author">Автор</label>
+                            <select id="edit-author" class="form-control" required></select>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label for="edit-text">Текст поста</label>
+                            <textarea id="edit-text" class="form-control" rows="2" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row mt-3">
+                        <div class="form-group col-md-4">
+                            <label for="edit-datetime">Дата та час</label>
+                            <input type="datetime-local" id="edit-datetime" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label for="edit-tags">Теги</label>
+                            <select id="edit-tags" class="form-control" multiple>
+                                <!-- JS заповнить опціями -->
+                            </select>
+                            <small class="form-text text-muted">Утримуйте Ctrl (Cmd на Mac), щоб вибрати декілька тегів</small>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary ml-2" onclick="closeInput()">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Posts container -->
+        <div id="posts" class="row">
+            <!-- JS додасть сюди картки постів -->
+        </div>
+    </div>
+
+    <script src="js/Post.js" defer></script>
+</body>
+</html>

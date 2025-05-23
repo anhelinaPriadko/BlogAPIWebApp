@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теги</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+    <h1>Теги</h1>
+    <button id="btnShowAdd">+ Додати тег</button>
+
+    <!-- Add Tag Form -->
+    <div id="addForm" class="hidden form-container">
+        <h2>Додати новий тег</h2>
+        <form id="add-tag-form" onsubmit="event.preventDefault(); addTag();">
+            <div class="form-row">
+                <label for="add-tagtext">Назва</label>
+                <input type="text" id="add-tagtext" required minlength="3" maxlength="60">
+            </div>
+            <div class="form-row actions">
+                <button type="submit">Зберегти</button>
+                <button type="button" onclick="hideAddForm()">Скасувати</button>
+            </div>
+        </form>
+    </div>
+    <!-- Tags Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Назва</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody id="tagsTableBody">
+            <tr>
+                <td colspan="7" style="text-align: center;">Завантаження тегів…</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- External JS -->
+    <script src="js/Tag.js" defer></script>
+</body>
+</html>

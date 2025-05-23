@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Користувачі</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+    <h1>Користувачі</h1>
+    <button id="btnShowAdd">+ Додати користувача</button>
+
+    <!-- Add User Form -->
+    <div id="addForm" class="hidden form-container">
+        <h2>Додати нового користувача</h2>
+        <form id="add-form" onsubmit="event.preventDefault(); addUser();">
+            <div class="form-row">
+                <label for="add-login">Логін</label>
+                <input type="text" id="add-login" required minlength="3" maxlength="60">
+            </div>
+            <div class="form-row">
+                <label for="add-name">Ім'я</label>
+                <input type="text" id="add-name" required minlength="3" maxlength="60">
+            </div>
+            <div class="form-row">
+                <label for="add-birthdate">Дата народження</label>
+                <input type="date" id="add-birthdate" required>
+            </div>
+            <div class="form-row">
+                <label for="add-avatar">Зображення</label>
+                <input type="text" id="add-avatar">
+            </div>
+            <div class="form-row">
+                <label for="add-about">Про себе</label>
+                <textarea id="add-about" maxlength="250"></textarea>
+            </div>
+            <div class="form-row">
+                <label>Активний</label>
+                <input type="checkbox" id="add-isactive">
+                <label>В мережі</label>
+                <input type="checkbox" id="add-isonline">
+            </div>
+            <div class="form-row actions">
+                <button type="submit">Зберегти</button>
+                <button type="button" onclick="hideAddForm()">Скасувати</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Edit User Form -->
+    <div id="editForm" class="hidden form-container">
+        <h2>Редагувати користувача</h2>
+        <form id="edit-form" onsubmit="return updateUser()">
+            <input type="hidden" id="edit-id">
+            <div class="form-row">
+                <label for="edit-login">Логін</label>
+                <input type="text" id="edit-login" required minlength="3" maxlength="60">
+            </div>
+            <div class="form-row">
+                <label for="edit-name">Ім'я</label>
+                <input type="text" id="edit-name" required minlength="3" maxlength="60">
+            </div>
+            <div class="form-row">
+                <label for="edit-birthdate">Дата народження</label>
+                <input type="date" id="edit-birthdate" required>
+            </div>
+            <div class="form-row">
+                <label for="edit-avatar">Зображення</label>
+                <input type="text" id="edit-avatar">
+            </div>
+            <div class="form-row">
+                <label for="edit-about">Про себе</label>
+                <textarea id="edit-about" maxlength="250"></textarea>
+            </div>
+            <div class="form-row">
+                <label>Активний</label>
+                <input type="checkbox" id="edit-isactive">
+                <label>В мережі</label>
+                <input type="checkbox" id="edit-isonline">
+            </div>
+            <div class="form-row actions">
+                <button type="submit">Оновити</button>
+                <button type="button" onclick="closeInput()">Скасувати</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Логін</th>
+                <th>Ім'я</th>
+                <th>Дата народження</th>
+                <th>Зображення</th>
+                <th>Активний</th>
+                <th>В мережі</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody">
+            <tr>
+                <td colspan="7" style="text-align: center;">Завантаження користувачів…</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- External JS -->
+    <script src="js/BlogUser.js" defer></script>
+    <script src="js/Forms.js" defer></script>
+</body>
+</html>
