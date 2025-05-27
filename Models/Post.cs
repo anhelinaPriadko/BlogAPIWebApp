@@ -7,7 +7,7 @@
         public string PostText { get; set; }
         public DateTime PostDateTime { get; set; }
 
-        public virtual BlogUser? Author { get; set; }
+        public virtual BlogUser Author { get; set; }
         public virtual ICollection<Like> Likes { get; set; }
         public virtual ICollection<PostTag> PostTags { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BlogAPIWebApp.Models;
+using BlogAPIWebApp.DTOs;
 
 namespace BlogAPIWebApp.Controllers
 {
@@ -22,37 +23,51 @@ namespace BlogAPIWebApp.Controllers
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts()
+        public async Task<ActionResult<IEnumerable<PostResponseDTO>>> GetPosts()
         {
-            var dtos = await _context.Posts
+            var posts = await _context.Posts
                 .Include(p => p.Author)
-                .Select(p => new PostDto
+                .Include(p => p.PostTags).ThenInclude(pt => pt.Tag)
+                .Select(p => new PostResponseDTO
                 {
                     Id = p.Id,
                     AuthorId = p.AuthorId,
                     AuthorName = p.Author.Name,
                     PostText = p.PostText,
-                    PostDateTime = p.PostDateTime
+                    PostDateTime = p.PostDateTime,
+                    Tags = p.PostTags
+                        .Select(pt => new TagDTO { Id = pt.Tag.Id, TagText = pt.Tag.TagText })
+                        .ToList()
                 })
                 .ToListAsync();
 
-            return Ok(dtos);
+            return Ok(posts);
         }
 
         // GET: api/Posts/5
+        // У PostsController.cs
         [HttpGet("{id}")]
-        public async Task<ActionResult<PostDto>> GetPost(int id)
+        public async Task<ActionResult<PostResponseDTO>> GetPost(int id)
         {
             var dto = await _context.Posts
-                .Include(p => p.Author)
                 .Where(p => p.Id == id)
-                .Select(p => new PostDto
+                .Include(p => p.Author)
+                .Include(p => p.PostTags)
+                    .ThenInclude(pt => pt.Tag)
+                .Select(p => new PostResponseDTO
                 {
                     Id = p.Id,
                     AuthorId = p.AuthorId,
                     AuthorName = p.Author.Name,
                     PostText = p.PostText,
-                    PostDateTime = p.PostDateTime
+                    PostDateTime = p.PostDateTime,
+                    Tags = p.PostTags
+                        .Select(pt => new TagDTO
+                        {
+                            Id = pt.Tag.Id,
+                            TagText = pt.Tag.TagText
+                        })
+                        .ToList()
                 })
                 .FirstOrDefaultAsync();
 
@@ -62,47 +77,74 @@ namespace BlogAPIWebApp.Controllers
             return Ok(dto);
         }
 
+
         // POST: api/Posts
+        // PostsController.cs
+
         [HttpPost]
-        public async Task<ActionResult<PostDto>> PostPost(PostCreateDto input)
+        public async Task<ActionResult<PostDTO>> PostPost([FromBody] PostDTO post)
         {
-            var post = new Post
-            {
-                AuthorId = input.AuthorId,
-                PostText = input.PostText,
-                PostDateTime = input.PostDateTime
-            };
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
+            var author = await _context.BlogUsers.FindAsync(post.AuthorId);
+            if (author == null)
+                return BadRequest($"Blog user {post.AuthorId} is not found");
 
-            var dto = new PostDto
+            var newPost = new Post
             {
-                Id = post.Id,
                 AuthorId = post.AuthorId,
-                AuthorName = (await _context.BlogUsers.FindAsync(post.AuthorId))?.Name,
                 PostText = post.PostText,
                 PostDateTime = post.PostDateTime
             };
 
-            return CreatedAtAction(nameof(GetPost), new { id = dto.Id }, dto);
+            foreach (var tagId in post.TagIds)
+                newPost.PostTags.Add(new PostTag { TagId = tagId });
+
+            _context.Posts.Add(newPost);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPost), new { id = newPost.Id }, newPost);
         }
+
 
         // PUT: api/Posts/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, PostCreateDto input)
+        public async Task<IActionResult> PutPost(int id, [FromBody] PostDTO post)
         {
-            var post = await _context.Posts.FindAsync(id);
-            if (post == null)
+            if (post.Id != id)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var old_post = await _context.Posts
+                .Include(p => p.PostTags)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (old_post == null)
                 return NotFound();
 
-            post.PostText = input.PostText;
-            post.PostDateTime = input.PostDateTime;
-            // Не дозволяємо міняти автора через PUT
+            var author = await _context.BlogUsers.FindAsync(post.AuthorId);
+            if (author == null)
+                return BadRequest($"Blog user {post.AuthorId} is not found");
+
+            // оновлюємо властивості
+            old_post.PostText = post.PostText;
+            old_post.PostDateTime = post.PostDateTime;
+            old_post.AuthorId = post.AuthorId;
+
+            // оновлюємо теги: очищаємо старі та додаємо нові
+            _context.PostTags.RemoveRange(old_post.PostTags);
+            foreach (var tagId in post.TagIds)
+            {
+                old_post.PostTags.Add(new PostTag { TagId = tagId, PostId = old_post.Id });
+            }
 
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
 
         // DELETE: api/Posts/5
         [HttpDelete("{id}")]

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BlogAPIWebApp.Models;
+using BlogAPIWebApp.DTOs;
 
 namespace BlogAPIWebApp.Controllers
 {
@@ -24,14 +25,20 @@ namespace BlogAPIWebApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptions()
         {
-            return await _context.Subscriptions.ToListAsync();
+            return await _context.Subscriptions
+                .Include(s => s.Reader)
+                .Include(s => s.Author)
+                .ToListAsync();
         }
 
         // GET: api/Subscriptions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Subscription>> GetSubscription(int id)
         {
-            var subscription = await _context.Subscriptions.FindAsync(id);
+            var subscription = await _context.Subscriptions
+                .Include(s => s.Reader)
+                .Include(s => s.Author)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (subscription == null)
             {
@@ -75,12 +82,32 @@ namespace BlogAPIWebApp.Controllers
         // POST: api/Subscriptions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Subscription>> PostSubscription(Subscription subscription)
+        public async Task<ActionResult<SubscriptionDTO>> PostSubscription(SubscriptionDTO subscription)
         {
-            _context.Subscriptions.Add(subscription);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var reader = await _context.BlogUsers.FindAsync(subscription.ReaderId);
+            if (reader == null)
+                return BadRequest($"Blog user {subscription.ReaderId} is not find");
+
+            var author = await _context.BlogUsers.FindAsync(subscription.AuthorId);
+            if (author == null)
+                return BadRequest($"Blog user {subscription.AuthorId} is not found");
+
+            var new_subscription = new Subscription
+            {
+                ReaderId = subscription.ReaderId,
+                AuthorId = subscription.AuthorId
+            };
+
+            new_subscription.Author = author;
+            new_subscription.Reader = reader;
+
+            _context.Subscriptions.Add(new_subscription);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSubscription", new { id = subscription.Id }, subscription);
+            return CreatedAtAction("GetSubscription", new { id = new_subscription.Id }, new_subscription);
         }
 
         // DELETE: api/Subscriptions/5

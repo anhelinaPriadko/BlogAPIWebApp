@@ -1,84 +1,86 @@
-﻿<!-- Posts.html -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Posts Management</title>
-    <!-- Підключіть Bootstrap CSS тут -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пости</title>
+    <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <div class="container my-4">
-        <h1 class="mb-4">Пости</h1>
+    <h1>Пости</h1>
+    <button id="btnShowAdd">+ Додати пост</button>
 
-        <h3>Додати пост</h3>
-        <form id="add-post-form" onsubmit="event.preventDefault(); addPost();" class="mb-5">
+    <!-- Add Post Form -->
+    <div id="addForm" class="hidden form-container">
+        <h2>Додати новий пост</h2>
+        <form id="add-form" onsubmit="event.preventDefault(); addPost();">
             <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="add-author">Автор</label>
-                    <select id="add-author" class="form-control" required></select>
-                </div>
-                <div class="form-group col-md-8">
-                    <label for="add-text">Текст поста</label>
-                    <textarea id="add-text" class="form-control" rows="2" placeholder="Post text" required></textarea>
-                </div>
+                <label for="add-author">Автор</label>
+                <select id="add-author" required></select>
             </div>
-            <div class="form-row mt-3">
-                <div class="form-group col-md-4">
-                    <label for="add-datetime">Дата та час</label>
-                    <input type="datetime-local" id="add-datetime" class="form-control" required>
-                </div>
-                <div class="form-group col-md-8">
-                    <label for="add-tags">Теги</label>
-                    <select id="add-tags" class="form-control" multiple>
-                        <!-- JS заповнить опціями -->
-                    </select>
-                    <small class="form-text text-muted">Утримуйте Ctrl (Cmd на Mac), щоб вибрати декілька тегів</small>
-                </div>
+            <div class="form-row">
+                <label for="add-text">Текст поста</label>
+                <textarea id="add-text" required minlength="1"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Add Post</button>
+            <div class="form-row">
+                <label for="add-datetime">Дата й час</label>
+                <input type="datetime-local" id="add-datetime" required>
+            </div>
+            <div class="form-row">
+                <label>Теги</label>
+                <div id="add-tags-container" class="checkbox-list"></div>
+            </div>
+            <div class="form-row actions">
+                <button type="submit">Зберегти</button>
+                <button type="button" onclick="hideAddForm()">Скасувати</button>
+            </div>
         </form>
-
-        <!-- Edit form -->
-        <div id="editForm" class="card mb-5" style="display:none;">
-            <div class="card-body">
-                <h3 class="card-title">Редагувати пост</h3>
-                <form onsubmit="event.preventDefault(); updatePost();">
-                    <input type="hidden" id="edit-id">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="edit-author">Автор</label>
-                            <select id="edit-author" class="form-control" required></select>
-                        </div>
-                        <div class="form-group col-md-8">
-                            <label for="edit-text">Текст поста</label>
-                            <textarea id="edit-text" class="form-control" rows="2" required></textarea>
-                        </div>
-                    </div>
-                    <div class="form-row mt-3">
-                        <div class="form-group col-md-4">
-                            <label for="edit-datetime">Дата та час</label>
-                            <input type="datetime-local" id="edit-datetime" class="form-control" required>
-                        </div>
-                        <div class="form-group col-md-8">
-                            <label for="edit-tags">Теги</label>
-                            <select id="edit-tags" class="form-control" multiple>
-                                <!-- JS заповнить опціями -->
-                            </select>
-                            <small class="form-text text-muted">Утримуйте Ctrl (Cmd на Mac), щоб вибрати декілька тегів</small>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-success">Save</button>
-                    <button type="button" class="btn btn-secondary ml-2" onclick="closeInput()">Cancel</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Posts container -->
-        <div id="posts" class="row">
-            <!-- JS додасть сюди картки постів -->
-        </div>
     </div>
 
+    <!-- Edit Post Form -->
+    <div id="editForm" class="hidden form-container">
+        <h2>Редагувати пост</h2>
+        <form id="edit-form" onsubmit="event.preventDefault(); updatePost();">
+            <input type="hidden" id="edit-id">
+            <div class="form-row">
+                <label for="edit-author">Автор</label>
+                <select id="edit-author" required></select>
+            </div>
+            <div class="form-row">
+                <label for="edit-text">Текст поста</label>
+                <textarea id="edit-text" required minlength="1"></textarea>
+            </div>
+            <div class="form-row">
+                <label for="edit-datetime">Дата й час</label>
+                <input type="datetime-local" id="edit-datetime" required>
+            </div>
+            <div class="form-row">
+                <label>Теги</label>
+                <div id="edit-tags-container" class="checkbox-list"></div>
+            </div>
+            <div class="form-row actions">
+                <button type="submit">Оновити</button>
+                <button type="button" onclick="closeInput()">Скасувати</button>
+            </div>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Автор</th>
+                <th>Текст</th>
+                <th>Дата й час</th>
+                <th>Теги</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody id="postsTableBody">
+            <tr><td colspan="5" style="text-align:center">Завантаження постів…</td></tr>
+        </tbody>
+    </table>
+
+    <script src="js/Forms.js" defer></script>
     <script src="js/Post.js" defer></script>
 </body>
 </html>
