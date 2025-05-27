@@ -125,11 +125,11 @@ function displayEditForm(id) {
 
 
 function toLocalDatetimeInputValue(isoString) {
-    const d = new Date(isoString);        // парсимо ISO з сервера
+    const d = new Date(isoString);
     const pad = n => String(n).padStart(2, '0');
 
     const year = d.getFullYear();
-    const month = pad(d.getMonth() + 1); // місяці від 0 до 11
+    const month = pad(d.getMonth() + 1);
     const day = pad(d.getDate());
     const hours = pad(d.getHours());
     const mins = pad(d.getMinutes());

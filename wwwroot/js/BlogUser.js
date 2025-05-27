@@ -92,34 +92,27 @@ function updateUser() {
 
 function _displayUsers(data) {
     const tbody = document.getElementById('usersTableBody');
-    // Очищаємо попередні рядки
     tbody.innerHTML = '';
 
     data.forEach(user => {
-        // Створюємо новий рядок
         const tr = document.createElement('tr');
 
-        // Логін
         let td = document.createElement('td');
         td.textContent = user.userLogin;
         tr.appendChild(td);
 
-        // Ім'я
         td = document.createElement('td');
         td.textContent = user.name;
         tr.appendChild(td);
 
-        // Дата народження
         td = document.createElement('td');
         td.textContent = user.birthDate.split('T')[0];
         tr.appendChild(td);
 
-        // Зображення
         td = document.createElement('td');
         td.textContent = user.avatarPath;
         tr.appendChild(td);
 
-        // Активний (чекбокс readonly)
         td = document.createElement('td');
         const chkActive = document.createElement('input');
         chkActive.type = 'checkbox';
@@ -128,7 +121,6 @@ function _displayUsers(data) {
         td.appendChild(chkActive);
         tr.appendChild(td);
 
-        // В мережі (чекбокс readonly)
         td = document.createElement('td');
         const chkOnline = document.createElement('input');
         chkOnline.type = 'checkbox';
@@ -137,7 +129,6 @@ function _displayUsers(data) {
         td.appendChild(chkOnline);
         tr.appendChild(td);
 
-        // Кнопки Дій
         td = document.createElement('td');
         const btnEdit = document.createElement('button');
         btnEdit.textContent = 'Редагувати';
@@ -149,11 +140,9 @@ function _displayUsers(data) {
         td.appendChild(btnDel);
         tr.appendChild(td);
 
-        // Додаємо рядок у таблицю
         tbody.appendChild(tr);
     });
 
-    // Оновлюємо локальний масив, якщо потрібен далі
     users = data;
 }
 
